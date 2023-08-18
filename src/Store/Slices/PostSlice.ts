@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { BASE_URL } from '../../Common';
+import { BASE_URL } from '../../../Common';
 
 export interface IPost {
   id: number;
