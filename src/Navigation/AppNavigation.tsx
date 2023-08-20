@@ -3,10 +3,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainScreen } from '../Screens/MainScreen';
 import { PostScreen } from '../Screens/PostScreen';
+import { AddPostScreen } from '../Screens/AddPostScreen';
 
 export type RootStackParamList = {
   Post: { id: number };
   Home: undefined;
+  AddPost: undefined;
 };
 
 export const AppNavigation = () => {
@@ -25,7 +27,13 @@ export const AppNavigation = () => {
           component={PostScreen}
           options={{
             title: '',
+            // headerShown: false,
           }}
+        />
+        <Stack.Screen
+          name="AddPost"
+          component={AddPostScreen}
+          // options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

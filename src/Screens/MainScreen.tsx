@@ -4,7 +4,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useEffect, useMemo } from 'react';
 import { RootStackParamList } from '../Navigation/AppNavigation';
 import { PostList } from '../Components/PostList';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import { Button } from '../Components/UI/Button';
 
 export const MainScreen: React.FC = () => {
   console.log('Render MainScreen');
@@ -19,7 +20,16 @@ export const MainScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.screenWrapper}>
-      <PostList />
+      <View style={{ flex: 1 }}>
+        <PostList />
+      </View>
+      <View>
+        <Button
+          title="Add post"
+          onPress={() => navigation.navigate('AddPost')}
+          style={styles.addPostBtn}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -27,5 +37,16 @@ export const MainScreen: React.FC = () => {
 const styles = StyleSheet.create({
   screenWrapper: {
     paddingHorizontal: 16,
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  addPostBtn: {
+    width: '100%',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 50,
+    backgroundColor: '#FF7F50',
+    marginBottom: 16,
+    marginTop: 16,
   },
 });

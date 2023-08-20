@@ -1,8 +1,9 @@
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, View, Text } from 'react-native';
 import { PostCart } from './PostCart';
 import { useAppDispatch, useAppSelector } from '../Store/Store';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { getPosts } from '../Store/Slices/PostSlice';
+import { Button } from './UI/Button';
 
 interface IPostListProps {}
 
@@ -16,9 +17,19 @@ export const PostList: React.FC<IPostListProps> = ({}) => {
     dispatch(getPosts());
   }, []);
 
+  const headerList = useMemo(
+    () => (
+      <View style={styles.titleLine}>
+        <Text style={styles.titile}>Posts:</Text>
+      </View>
+    ),
+    []
+  );
+
   return (
-    <>
+    <View style={{}}>
       <FlatList
+        ListHeaderComponent={headerList}
         style={styles.listWrapper}
         data={posts}
         showsVerticalScrollIndicator={false}
@@ -27,12 +38,19 @@ export const PostList: React.FC<IPostListProps> = ({}) => {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   listWrapper: {
     paddingTop: 20,
+  },
+
+  titleLine: { marginBottom: 20 },
+  titile: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800',
   },
 });

@@ -5,60 +5,125 @@ import {
   TextInput,
   TouchableHighlight,
 } from 'react-native';
-import { IPost } from '../Store/Slices/PostSlice';
-import { useState } from 'react';
+import { IPost, changePost, deletePost } from '../Store/Slices/PostSlice';
+import { useCallback, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../Navigation/AppNavigation';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAppDispatch, useAppSelector } from '../Store/Store';
+import { inputTextValidate } from '../../Common';
 
 export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
   console.log('Render PostCart');
 
   const [editable, setEditable] = useState<boolean>(false);
+  const [newTitle, setNewTitle] = useState<string>(title);
+  const [newBody, setNewBody] = useState<string>(body);
+  const [error, setError] = useState<string | null>(null);
+
+  const bodySplit =
+    body.length >= 300 ? `${body.split(' ').slice(0, 20).join(' ')}...` : body;
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.posts);
+
+  const deletePostToggle = useCallback(() => {
+    dispatch(deletePost(id));
+  }, []);
+
+  const editPostToggle = useCallback(() => {
+    setEditable(true);
+  }, []);
+
+  const cancelChangePost = useCallback(() => {
+    setNewTitle(title);
+    setNewBody(body);
+    setEditable(false);
+  }, []);
+
+  const saveChanges = useCallback(async () => {
+    setError(null);
+    if (inputTextValidate(newTitle)) {
+      setError('Title must be filled');
+      return;
+    }
+    if (inputTextValidate(newBody)) {
+      setError('Body must be filled');
+      return;
+    }
+    const changesPost = {
+      title: newTitle,
+      body: newBody,
+      id,
+    };
+
+    await dispatch(changePost(changesPost));
+    setEditable(false);
+  }, [newTitle, newBody]);
 
   {
     /* TODO: тайтл инпут выталкивает иконки */
   }
 
   return (
-    <View style={styles.postWraper}>
-      <View style={styles.titleLine}>
-        <View style={{ maxWidth: '70%' }}>
-          <TextInput
-            style={!editable ? styles.title : styles.activeTitle}
-            multiline
-            numberOfLines={2}
-            value={title}
-            editable={editable}
-          />
-        </View>
-        <View>
-          <View style={styles.btnBlock}>
-            <TouchableHighlight onPress={() => setEditable(!editable)}>
-              {!editable ? (
-                <AntDesign name="delete" size={24} color="black" />
-              ) : (
-                <MaterialIcons name="cancel" size={24} color="black" />
-              )}
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => setEditable(!editable)}>
-              {!editable ? (
-                <AntDesign name="edit" size={24} color="black" />
-              ) : (
-                <AntDesign name="save" size={24} color="black" />
-              )}
-            </TouchableHighlight>
+    <TouchableHighlight
+      disabled={editable}
+      onPress={() => navigation.navigate('Post', { id })}
+      style={styles.postWraper}
+    >
+      <>
+        {loading && <Text>Processing...</Text>}
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        <View style={styles.titleLine}>
+          <View style={{ maxWidth: '70%' }}>
+            <TextInput
+              style={!editable ? styles.title : styles.activeTitle}
+              multiline
+              value={newTitle}
+              editable={editable}
+              onChangeText={(value) => setNewTitle(value)}
+            />
+          </View>
+          <View>
+            <View style={styles.btnBlock}>
+              <TouchableHighlight
+                onPress={!editable ? deletePostToggle : cancelChangePost}
+              >
+                {!editable ? (
+                  <AntDesign name="delete" size={24} color="black" />
+                ) : (
+                  <MaterialIcons name="cancel" size={24} color="black" />
+                )}
+              </TouchableHighlight>
+              <TouchableHighlight
+                onPress={!editable ? editPostToggle : saveChanges}
+              >
+                {!editable ? (
+                  <AntDesign name="edit" size={24} color="black" />
+                ) : (
+                  <AntDesign name="save" size={24} color="black" />
+                )}
+              </TouchableHighlight>
+            </View>
           </View>
         </View>
-      </View>
 
-      <TextInput
-        editable={editable}
-        style={editable ? styles.activeBody : styles.body}
-        multiline
-        value={body}
-        scrollEnabled={editable}
-      />
-    </View>
+        <TextInput
+          editable={editable}
+          style={editable ? styles.activeBody : styles.body}
+          multiline
+          value={editable ? newBody : bodySplit}
+          onChangeText={(value) => setNewBody(value)}
+          textAlignVertical="top"
+          scrollEnabled={editable}
+        />
+      </>
+    </TouchableHighlight>
   );
 };
 
@@ -69,7 +134,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 12,
-    flexWrap: 'nowrap',
+    backgroundColor: '#fff',
   },
   btnBlock: {
     flexDirection: 'row',
@@ -87,6 +152,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
     fontWeight: '700',
+    minWidth: '100%',
   },
   activeTitle: {
     fontSize: 16,
@@ -95,6 +161,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
+    minWidth: '100%',
   },
   body: {
     fontSize: 14,
@@ -106,5 +173,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
+    maxHeight: 180,
+  },
+  errorText: {
+    color: 'red',
   },
 });

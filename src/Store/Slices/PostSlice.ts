@@ -48,8 +48,8 @@ export const deletePost = createAsyncThunk(
         'Content-type': 'application/json',
       },
     });
-    const data = (await response.json()) as IPost;
-    return data;
+
+    return postID;
   }
 );
 
@@ -87,8 +87,11 @@ export const postSlice = createSlice({
         state.posts.push(action.payload);
       }),
       builder.addCase(deletePost.fulfilled, (state, action) => {
-        const index = state.posts?.indexOf(action.payload);
+        const index = state.posts?.findIndex((el) => el.id === action.payload);
         state.posts.splice(index, 1);
+      }),
+      builder.addCase(changePost.pending, (state) => {
+        state.loading = true;
       }),
       builder.addCase(changePost.fulfilled, (state, action) => {
         const { id, title, body } = action.payload;
@@ -98,6 +101,7 @@ export const postSlice = createSlice({
           title,
           body,
         };
+        state.loading = false;
       });
   },
 });
