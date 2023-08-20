@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
 import { BASE_URL } from '../../../Common';
 
 export interface IPost {
@@ -10,10 +9,12 @@ export interface IPost {
 
 interface IState {
   posts: IPost[];
+  loading: boolean;
 }
 
 const initialState: IState = {
   posts: [],
+  loading: false,
 };
 const sliceName = 'posts';
 
@@ -75,8 +76,12 @@ export const postSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(getPosts.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(getPosts.fulfilled, (state, action) => {
       state.posts = action.payload;
+      state.loading = false;
     }),
       builder.addCase(addPost.fulfilled, (state, action) => {
         state.posts.push(action.payload);
