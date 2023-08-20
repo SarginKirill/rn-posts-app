@@ -72,6 +72,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
 
   return (
     <TouchableHighlight
+      underlayColor="transparent"
       disabled={editable}
       onPress={() => navigation.navigate('Post', { id })}
       style={styles.postWraper}
@@ -92,6 +93,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
           <View>
             <View style={styles.btnBlock}>
               <TouchableHighlight
+                underlayColor="transparent"
                 onPress={!editable ? deletePostToggle : cancelChangePost}
               >
                 {!editable ? (
@@ -101,6 +103,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
                 )}
               </TouchableHighlight>
               <TouchableHighlight
+                underlayColor="transparent"
                 onPress={!editable ? editPostToggle : saveChanges}
               >
                 {!editable ? (

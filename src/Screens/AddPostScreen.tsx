@@ -66,7 +66,7 @@ export const AddPostScreen: React.FC<
       </View>
       <View>
         {validate && <Text style={styles.errorText}>{validate}</Text>}
-        <Button style={styles.btn} title="Add post" onPress={addNewPost} />
+        <Button style={styles.btn} title="Add new post" onPress={addNewPost} />
       </View>
     </SafeAreaView>
   );
