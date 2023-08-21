@@ -1,4 +1,4 @@
-import { FlatList, View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../Store/Store';
 import { CommentItem } from './CommentItem';
 import { useEffect, useState } from 'react';
@@ -10,8 +10,6 @@ interface ICommentsListProps {
 }
 
 export const CommentsList: React.FC<ICommentsListProps> = ({ postId }) => {
-  console.log('Render CommentsList');
-
   const { comments } = useAppSelector((state) => state.comments);
   const dispatch = useAppDispatch();
 
@@ -22,7 +20,7 @@ export const CommentsList: React.FC<ICommentsListProps> = ({ postId }) => {
   }, [loading]);
 
   if (!comments.length) {
-    return <Text style={[styles.titleBlock]}>No comments...</Text>;
+    return <Text style={styles.titleBlock}>No comments...</Text>;
   }
 
   return (

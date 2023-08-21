@@ -1,29 +1,15 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableHighlight,
-  TextInput,
-} from 'react-native';
-import {
-  IComment,
-  changeComment,
-  deleteComment,
-} from '../Store/Slices/CommentsSlice';
+import { StyleSheet, View, TouchableHighlight, TextInput } from 'react-native';
+import { IComment } from '../Store/Slices/CommentsSlice';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAppDispatch } from '../Store/Store';
 import { inputTextValidate } from '../../Common';
 import { useComments } from '../Hooks/useComments';
 import { Loader } from './UI/Loader';
 
 export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
-  console.log('Render CommentItem');
   const [editable, setEditable] = useState(false);
   const [newValue, setNewValue] = useState(text);
-
-  const [error, setError] = useState<string | null>(null);
 
   const { loading, deleteCommentToggle, saveChanges } = useComments();
 
@@ -42,14 +28,14 @@ export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
   const cancelChangePost = useCallback(() => {
     setNewValue(text);
     setEditable(false);
-  }, []);
+  }, [text]);
 
   const sendSave = useCallback(() => {
-    setError(null);
     if (inputTextValidate(newValue)) {
-      setError('Input must be filled');
       return;
     }
+
+    setNewValue(newValue.trim());
     const changedComment = {
       text: newValue,
       id,
@@ -58,7 +44,7 @@ export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
 
     saveChanges(changedComment);
     setEditable(false);
-  }, []);
+  }, [newValue]);
 
   if (loading) {
     return <Loader title="Processing..." />;
@@ -108,7 +94,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    position: 'relative',
     alignItems: 'center',
   },
   btnLine: {

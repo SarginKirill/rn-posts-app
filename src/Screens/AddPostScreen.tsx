@@ -12,15 +12,13 @@ import { inputTextValidate } from '../../Common';
 export const AddPostScreen: React.FC<
   StackScreenProps<RootStackParamList, 'AddPost'>
 > = ({ navigation }) => {
-  console.log('Render AddPostScreen');
-
   const dispatch = useAppDispatch();
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [validate, setValidate] = useState<string | null>(null);
 
-  const addNewPost = useCallback(() => {
+  const addNewPost = useCallback(async () => {
     setValidate(null);
 
     if (inputTextValidate(title)) {
@@ -37,7 +35,8 @@ export const AddPostScreen: React.FC<
       body,
       id: +Date.now(),
     };
-    dispatch(addPost(newPost));
+
+    await dispatch(addPost(newPost));
     navigation.goBack();
   }, [title, body, validate]);
 

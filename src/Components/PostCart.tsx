@@ -7,26 +7,30 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { IPost, changePost, deletePost } from '../Store/Slices/PostSlice';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../Navigation/AppNavigation';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAppDispatch, useAppSelector } from '../Store/Store';
+import { useAppDispatch } from '../Store/Store';
 import { inputTextValidate } from '../../Common';
+import { Loader } from './UI/Loader';
 
 export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
-  console.log('Render PostCart');
-
   const [editable, setEditable] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState<string>(title);
   const [newBody, setNewBody] = useState<string>(body);
   const [error, setError] = useState<string | null>(null);
 
-  const bodySplit =
-    body.length >= 300 ? `${body.split(' ').slice(0, 20).join(' ')}...` : body;
+  const bodySplit = useMemo(
+    () =>
+      body.length >= 300
+        ? `${body.split(' ').slice(0, 20).join(' ')}...`
+        : body,
+    [body]
+  );
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -35,7 +39,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
 
   const deletePostToggle = useCallback(() => {
     dispatch(deletePost(id));
-  }, []);
+  }, [id]);
 
   const editPostToggle = useCallback(() => {
     setEditable(true);
@@ -45,7 +49,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
     setNewTitle(title);
     setNewBody(body);
     setEditable(false);
-  }, []);
+  }, [title, body]);
 
   const saveChanges = useCallback(() => {
     setError(null);
@@ -57,47 +61,88 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
       setError('Body must be filled');
       return;
     }
+
     const changesPost = {
-      title: newTitle,
-      body: newBody,
+      title: newTitle.trim(),
+      body: newBody.trim(),
       id,
     };
+
     setLoading(true);
 
-    dispatch(changePost(changesPost)).finally(() => {
-      setLoading(false);
-      setEditable(false);
-    });
+    dispatch(changePost(changesPost))
+      .then(({ meta: { arg } }) => {
+        setNewTitle(arg.title);
+        setNewBody(arg.body);
+      })
+      .finally(() => {
+        setLoading(false);
+        setEditable(false);
+      });
   }, [newTitle, newBody]);
 
-  {
-    /* TODO: тайтл инпут выталкивает иконки */
-  }
+  const navigateToPost = useCallback(
+    () => navigation.navigate('Post', { id }),
+    [id]
+  );
 
-  return (
-    <TouchableOpacity
-      disabled={editable}
-      onPress={() => navigation.navigate('Post', { id })}
-      style={styles.postWraper}
-    >
+  const changeTitle = useCallback(
+    (value: string) => setNewTitle(value),
+    [newTitle]
+  );
+  const changeBody = useCallback(
+    (value: string) => setNewBody(value),
+    [newBody]
+  );
+
+  const content = useMemo(
+    () => (
       <>
-        {loading && <Text>Processing...</Text>}
-        {error && <Text style={styles.errorText}>{error}</Text>}
         <View style={styles.titleLine}>
-          <View style={{ maxWidth: '70%' }}>
+          <View style={styles.flexOne}>
+            <Text style={styles.title}>{newTitle}</Text>
+          </View>
+          <View>
+            <View style={styles.btnBlock}>
+              <TouchableHighlight
+                underlayColor="transparent"
+                onPress={deletePostToggle}
+              >
+                <AntDesign name="delete" size={24} color="black" />
+              </TouchableHighlight>
+              <TouchableHighlight
+                underlayColor="transparent"
+                onPress={editPostToggle}
+              >
+                <AntDesign name="edit" size={24} color="black" />
+              </TouchableHighlight>
+            </View>
+          </View>
+        </View>
+        <Text style={styles.body}>{bodySplit}</Text>
+      </>
+    ),
+    [newTitle, newBody, editable]
+  );
+
+  const editableContent = useMemo(
+    () => (
+      <>
+        <View style={styles.titleLine}>
+          <View style={styles.flexOne}>
             <TextInput
-              style={!editable ? styles.title : styles.activeTitle}
+              style={styles.activeTitle}
               multiline
               value={newTitle}
               editable={editable}
-              onChangeText={(value) => setNewTitle(value)}
+              onChangeText={changeTitle}
             />
           </View>
           <View>
             <View style={styles.btnBlock}>
               <TouchableHighlight
                 underlayColor="transparent"
-                onPress={!editable ? deletePostToggle : cancelChangePost}
+                onPress={cancelChangePost}
               >
                 {!editable ? (
                   <AntDesign name="delete" size={24} color="black" />
@@ -107,7 +152,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
               </TouchableHighlight>
               <TouchableHighlight
                 underlayColor="transparent"
-                onPress={!editable ? editPostToggle : saveChanges}
+                onPress={saveChanges}
               >
                 {!editable ? (
                   <AntDesign name="edit" size={24} color="black" />
@@ -119,19 +164,32 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
           </View>
         </View>
         <TextInput
-          editable={editable}
-          style={editable ? styles.activeBody : styles.body}
+          style={styles.activeBody}
           multiline
-          value={editable ? newBody : bodySplit}
-          onChangeText={(value) => setNewBody(value)}
+          value={newBody}
+          onChangeText={changeBody}
           scrollEnabled={editable}
         />
       </>
+    ),
+    [newTitle, newBody, editable]
+  );
+
+  return (
+    <TouchableOpacity
+      disabled={editable}
+      onPress={navigateToPost}
+      style={styles.postWraper}
+    >
+      {loading && <Loader title="Processing..." />}
+      {error && <Text style={styles.errorText}>{error}</Text>}
+      {!editable ? content : editableContent}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  flexOne: { flex: 1 },
   postWraper: {
     paddingHorizontal: 16,
     paddingVertical: 24,

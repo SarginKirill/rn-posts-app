@@ -40,7 +40,7 @@ export const addPost = createAsyncThunk(
 export const deletePost = createAsyncThunk(
   `${sliceName}/deletePosts`,
   async (postID: number) => {
-    const response = await fetch(`${BASE_URL}/posts/${postID}`, {
+    await fetch(`${BASE_URL}/posts/${postID}`, {
       method: 'DELETE',
       headers: {
         'Content-type': 'application/json',
@@ -64,6 +64,7 @@ export const changePost = createAsyncThunk(
     });
 
     const data = (await response.json()) as IPost;
+
     if (!!Object.keys(data).length) return data;
     return post;
   }
@@ -81,8 +82,7 @@ export const postSlice = createSlice({
         state.posts.push(action.payload);
       }),
       builder.addCase(deletePost.fulfilled, (state, action) => {
-        const index = state.posts?.findIndex((el) => el.id === action.payload);
-        state.posts.splice(index, 1);
+        state.posts = state.posts.filter((el) => el.id !== action.payload);
       }),
       builder.addCase(changePost.fulfilled, (state, action) => {
         const { id, title, body } = action.payload;
@@ -95,7 +95,5 @@ export const postSlice = createSlice({
       });
   },
 });
-
-export const {} = postSlice.actions;
 
 export default postSlice.reducer;

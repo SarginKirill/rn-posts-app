@@ -17,8 +17,6 @@ export const Input: React.FC<IInputProps> = ({
   multiline = false,
   style,
 }) => {
-  console.log('Render Input');
-
   return (
     <TextInput
       value={value}

@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { BASE_URL } from '../../../Common';
-import { getPosts } from './PostSlice';
 
 export interface IComment {
   id: number;
@@ -44,7 +43,7 @@ export const addComment = createAsyncThunk(
 export const deleteComment = createAsyncThunk(
   `${sliceName}/deleteComment`,
   async (commentID: number) => {
-    const response = await fetch(`${BASE_URL}/comments/${commentID}`, {
+    await fetch(`${BASE_URL}/comments/${commentID}`, {
       method: 'DELETE',
       headers: {
         'Content-type': 'application/json',
@@ -85,10 +84,9 @@ export const commentsSlice = createSlice({
         state.comments.push(action.payload);
       }),
       builder.addCase(deleteComment.fulfilled, (state, action) => {
-        const index = state.comments?.findIndex(
-          (el) => el.id === action.payload
+        state.comments = state.comments.filter(
+          (el) => el.id !== action.payload
         );
-        state.comments.splice(index, 1);
       }),
       builder.addCase(changeComment.fulfilled, (state, action) => {
         const { id, postId, text } = action.payload;
@@ -101,7 +99,5 @@ export const commentsSlice = createSlice({
       });
   },
 });
-
-export const {} = commentsSlice.actions;
 
 export default commentsSlice.reducer;

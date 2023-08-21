@@ -13,8 +13,6 @@ interface IButtonProps {
 }
 
 export const Button: React.FC<IButtonProps> = ({ title, onPress, style }) => {
-  console.log('Render Button');
-
   return (
     <TouchableHighlight underlayColor="#a35234" style={style} onPress={onPress}>
       <Text style={styles.btnText}>{title}</Text>
