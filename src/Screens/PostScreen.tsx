@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 1,
     color: '#000',
+    paddingRight: 50,
   },
   inputTitle: {
     fontSize: 18,
@@ -147,9 +148,12 @@ const styles = StyleSheet.create({
     position: 'relative',
     flexDirection: 'row',
     justifyContent: 'space-between',
+
+    alignItems: 'center',
   },
   sendIcon: {
     position: 'absolute',
     right: 0,
+    bottom: 10,
   },
 });

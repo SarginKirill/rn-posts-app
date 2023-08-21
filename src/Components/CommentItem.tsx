@@ -29,12 +29,6 @@ export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
 
   const inputRef = useRef<TextInput>(null);
 
-  // const dispatch = useAppDispatch();
-
-  // const deleteCommentToggle = useCallback(() => {
-  //   dispatch(deleteComment(id));
-  // }, []);
-
   const editPostToggle = useCallback(() => {
     setEditable(true);
   }, [inputRef, editable]);
@@ -77,6 +71,7 @@ export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
         ref={inputRef}
         value={newValue}
         editable={editable}
+        multiline
         onChangeText={(value) => setNewValue(value)}
       />
       <View style={styles.btnLine}>
