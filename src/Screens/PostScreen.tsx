@@ -65,8 +65,6 @@ export const PostScreen: React.FC = () => {
     []
   );
 
-  console.log('Render PostScreen');
-
   return (
     <SafeAreaView edges={['bottom']} style={styles.screenContainer}>
       <KeyboardAvoidingView
