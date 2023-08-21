@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
   listWrapper: {
     paddingTop: 20,
   },
-
   titleLine: { marginBottom: 20 },
   titile: {
     fontSize: 28,

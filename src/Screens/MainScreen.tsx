@@ -18,7 +18,7 @@ export const MainScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.screenWrapper}>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flexOne}>
         <PostList />
       </View>
       <View>
@@ -33,6 +33,7 @@ export const MainScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  flexOne: { flex: 1 },
   screenWrapper: {
     paddingHorizontal: 16,
     flex: 1,
