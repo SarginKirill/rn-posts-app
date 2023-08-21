@@ -10,12 +10,10 @@ export interface IComment {
 
 interface IState {
   comments: IComment[];
-  loading: boolean;
 }
 
 const initialState: IState = {
   comments: [],
-  loading: false,
 };
 const sliceName = 'comments';
 
@@ -80,12 +78,8 @@ export const commentsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getComments.pending, (state) => {
-      state.loading = true;
-    });
     builder.addCase(getComments.fulfilled, (state, action) => {
       state.comments = action.payload;
-      state.loading = false;
     }),
       builder.addCase(addComment.fulfilled, (state, action) => {
         state.comments.push(action.payload);
@@ -96,9 +90,6 @@ export const commentsSlice = createSlice({
         );
         state.comments.splice(index, 1);
       }),
-      builder.addCase(changeComment.pending, (state) => {
-        state.loading = true;
-      }),
       builder.addCase(changeComment.fulfilled, (state, action) => {
         const { id, postId, text } = action.payload;
         const index = state.comments.findIndex((comment) => comment.id === id);
@@ -107,7 +98,6 @@ export const commentsSlice = createSlice({
           text,
           postId,
         };
-        state.loading = false;
       });
   },
 });

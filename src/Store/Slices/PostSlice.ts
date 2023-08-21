@@ -9,12 +9,10 @@ export interface IPost {
 
 interface IState {
   posts: IPost[];
-  loading: boolean;
 }
 
 const initialState: IState = {
   posts: [],
-  loading: false,
 };
 const sliceName = 'posts';
 
@@ -76,12 +74,8 @@ export const postSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getPosts.pending, (state) => {
-      state.loading = true;
-    });
     builder.addCase(getPosts.fulfilled, (state, action) => {
       state.posts = action.payload;
-      state.loading = false;
     }),
       builder.addCase(addPost.fulfilled, (state, action) => {
         state.posts.push(action.payload);
@@ -89,9 +83,6 @@ export const postSlice = createSlice({
       builder.addCase(deletePost.fulfilled, (state, action) => {
         const index = state.posts?.findIndex((el) => el.id === action.payload);
         state.posts.splice(index, 1);
-      }),
-      builder.addCase(changePost.pending, (state) => {
-        state.loading = true;
       }),
       builder.addCase(changePost.fulfilled, (state, action) => {
         const { id, title, body } = action.payload;
@@ -101,7 +92,6 @@ export const postSlice = createSlice({
           title,
           body,
         };
-        state.loading = false;
       });
   },
 });
