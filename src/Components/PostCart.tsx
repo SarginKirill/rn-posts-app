@@ -76,7 +76,6 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
 
   return (
     <TouchableOpacity
-      // underlayColor="transparent"
       disabled={editable}
       onPress={() => navigation.navigate('Post', { id })}
       style={styles.postWraper}

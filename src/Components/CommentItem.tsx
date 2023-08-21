@@ -113,10 +113,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    position: 'relative',
+    alignItems: 'center',
   },
   btnLine: {
     flexDirection: 'row',
     gap: 15,
+    position: 'absolute',
+    right: 10,
   },
-  input: { color: '#000' },
+  input: { color: '#000', paddingRight: 70 },
 });
