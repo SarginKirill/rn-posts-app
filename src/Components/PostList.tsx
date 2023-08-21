@@ -30,6 +30,7 @@ export const PostList: React.FC<IPostListProps> = ({}) => {
     <View style={{}}>
       <FlatList
         ListHeaderComponent={headerList}
+        contentContainerStyle={{ paddingBottom: 10 }}
         style={styles.listWrapper}
         data={posts}
         showsVerticalScrollIndicator={false}

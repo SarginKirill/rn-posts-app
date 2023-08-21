@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableHighlight,
+  TouchableOpacity,
 } from 'react-native';
 import { IPost, changePost, deletePost } from '../Store/Slices/PostSlice';
 import { useCallback, useState } from 'react';
@@ -19,6 +20,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
   console.log('Render PostCart');
 
   const [editable, setEditable] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState<string>(title);
   const [newBody, setNewBody] = useState<string>(body);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,6 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state) => state.posts);
 
   const deletePostToggle = useCallback(() => {
     dispatch(deletePost(id));
@@ -46,7 +47,7 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
     setEditable(false);
   }, []);
 
-  const saveChanges = useCallback(async () => {
+  const saveChanges = useCallback(() => {
     setError(null);
     if (inputTextValidate(newTitle)) {
       setError('Title must be filled');
@@ -61,9 +62,12 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
       body: newBody,
       id,
     };
+    setLoading(true);
 
-    await dispatch(changePost(changesPost));
-    setEditable(false);
+    dispatch(changePost(changesPost)).finally(() => {
+      setLoading(false);
+      setEditable(false);
+    });
   }, [newTitle, newBody]);
 
   {
@@ -71,8 +75,8 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
   }
 
   return (
-    <TouchableHighlight
-      underlayColor="transparent"
+    <TouchableOpacity
+      // underlayColor="transparent"
       disabled={editable}
       onPress={() => navigation.navigate('Post', { id })}
       style={styles.postWraper}
@@ -115,18 +119,16 @@ export const PostCart: React.FC<IPost> = ({ id, title, body }) => {
             </View>
           </View>
         </View>
-
         <TextInput
           editable={editable}
           style={editable ? styles.activeBody : styles.body}
           multiline
           value={editable ? newBody : bodySplit}
           onChangeText={(value) => setNewBody(value)}
-          textAlignVertical="top"
           scrollEnabled={editable}
         />
       </>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 };
 
@@ -156,6 +158,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: '700',
     minWidth: '100%',
+    color: '#000',
   },
   activeTitle: {
     fontSize: 16,
@@ -165,10 +168,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     minWidth: '100%',
+    color: '#000',
   },
   body: {
     fontSize: 14,
     lineHeight: 18,
+    color: '#000',
   },
   activeBody: {
     fontSize: 14,
@@ -177,6 +182,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     maxHeight: 180,
+
+    color: '#000',
   },
   errorText: {
     color: 'red',

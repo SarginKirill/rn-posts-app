@@ -25,8 +25,9 @@ export const Input: React.FC<IInputProps> = ({
       placeholder={placeholder}
       onChangeText={onTextChange}
       autoFocus={autoFocus}
-      style={style}
+      style={[style]}
       multiline={multiline}
+      textAlignVertical="top"
     />
   );
 };

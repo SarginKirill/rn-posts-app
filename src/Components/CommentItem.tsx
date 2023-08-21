@@ -12,9 +12,11 @@ import {
 } from '../Store/Slices/CommentsSlice';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../Store/Store';
 import { inputTextValidate } from '../../Common';
+import { useComments } from '../Hooks/useComments';
+import { Loader } from './UI/Loader';
 
 export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
   console.log('Render CommentItem');
@@ -23,55 +25,64 @@ export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
 
   const [error, setError] = useState<string | null>(null);
 
+  const { loading, deleteCommentToggle, saveChanges } = useComments();
+
   const inputRef = useRef<TextInput>(null);
 
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
-  const deleteCommentToggle = useCallback(() => {
-    dispatch(deleteComment(id));
-  }, []);
+  // const deleteCommentToggle = useCallback(() => {
+  //   dispatch(deleteComment(id));
+  // }, []);
 
   const editPostToggle = useCallback(() => {
     setEditable(true);
-    inputRef.current?.focus();
-    console.log('TEST', inputRef.current?.isFocused());
   }, [inputRef, editable]);
+
+  useEffect(() => {
+    if (editable) {
+      inputRef.current?.focus();
+    }
+  }, [editable]);
 
   const cancelChangePost = useCallback(() => {
     setNewValue(text);
     setEditable(false);
   }, []);
 
-  const saveChanges = useCallback(async () => {
+  const sendSave = useCallback(() => {
     setError(null);
     if (inputTextValidate(newValue)) {
       setError('Input must be filled');
       return;
     }
-    const changesPost = {
+    const changedComment = {
       text: newValue,
       id,
       postId,
     };
 
-    await dispatch(changeComment(changesPost));
+    saveChanges(changedComment);
     setEditable(false);
-  }, [newValue]);
+  }, []);
+
+  if (loading) {
+    return <Loader title="Processing..." />;
+  }
 
   return (
     <View style={styles.commentContainer}>
-      <View>
-        <TextInput
-          ref={inputRef}
-          value={newValue}
-          editable={editable}
-          onChangeText={(value) => setNewValue(value)}
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        ref={inputRef}
+        value={newValue}
+        editable={editable}
+        onChangeText={(value) => setNewValue(value)}
+      />
       <View style={styles.btnLine}>
         <TouchableHighlight
           underlayColor="transparent"
-          onPress={!editable ? deleteCommentToggle : cancelChangePost}
+          onPress={!editable ? () => deleteCommentToggle(id) : cancelChangePost}
         >
           {!editable ? (
             <AntDesign name="delete" size={20} color="black" />
@@ -81,7 +92,7 @@ export const CommentItem: React.FC<IComment> = ({ id, postId, text }) => {
         </TouchableHighlight>
         <TouchableHighlight
           underlayColor="transparent"
-          onPress={!editable ? editPostToggle : saveChanges}
+          onPress={!editable ? editPostToggle : sendSave}
         >
           {!editable ? (
             <AntDesign name="edit" size={20} color="black" />
@@ -107,4 +118,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 15,
   },
+  input: { color: '#000' },
 });

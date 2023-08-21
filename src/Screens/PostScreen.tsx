@@ -6,6 +6,10 @@ import {
   ScrollView,
   TextInput,
   TouchableHighlight,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../Store/Store';
@@ -52,39 +56,50 @@ export const PostScreen: React.FC = () => {
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.screenContainer}>
-      <View style={styles.sreenWrapper}>
-        <ScrollView
-          nestedScrollEnabled={true}
-          bounces={false}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.title}>{post?.title}</Text>
-          <Text style={styles.body}>{post?.body}</Text>
-          <View>
-            <CommentsList postId={postId} />
-          </View>
-        </ScrollView>
-      </View>
-      <View style={styles.inputCommentLine}>
-        <Text style={styles.inputTitle}>Add new Comment:</Text>
-
-        <View style={styles.inputLine}>
-          <TextInput
-            style={styles.input}
-            value={newCommentValue}
-            onChangeText={(value) => setNewCommentValue(value)}
-            placeholder="Enter your comment"
-            autoFocus
-          />
-          <TouchableHighlight
-            style={styles.sendIcon}
-            underlayColor="transparent"
-            onPress={addNewComment}
+      <TouchableOpacity
+        activeOpacity={1}
+        style={{ flex: 1 }}
+        onPress={() => Keyboard.dismiss()}
+      >
+        <View style={styles.sreenWrapper}>
+          <ScrollView
+            nestedScrollEnabled={true}
+            bounces={false}
+            showsVerticalScrollIndicator={false}
           >
-            <Ionicons name="send" size={20} color="black" />
-          </TouchableHighlight>
+            <Text style={styles.title}>{post?.title}</Text>
+            <Text style={styles.body}>{post?.body}</Text>
+            <View>
+              <CommentsList postId={postId} />
+            </View>
+          </ScrollView>
         </View>
-      </View>
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={50}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View style={styles.inputCommentLine}>
+            <Text style={styles.inputTitle}>Add new Comment:</Text>
+
+            <View style={styles.inputLine}>
+              <TextInput
+                style={styles.input}
+                value={newCommentValue}
+                onChangeText={(value) => setNewCommentValue(value)}
+                placeholder="Enter your comment"
+                autoFocus
+              />
+              <TouchableHighlight
+                style={styles.sendIcon}
+                underlayColor="transparent"
+                onPress={addNewComment}
+              >
+                <Ionicons name="send" size={20} color="black" />
+              </TouchableHighlight>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -112,8 +127,6 @@ const styles = StyleSheet.create({
   inputCommentLine: {
     paddingTop: 12,
     marginBottom: 20,
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
     paddingHorizontal: 16,
     backgroundColor: '#fff',
   },
@@ -121,6 +134,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingBottom: 10,
     marginRight: 35,
+    width: '100%',
+    borderBottomWidth: 1,
+    color: '#000',
   },
   inputTitle: {
     fontSize: 18,
